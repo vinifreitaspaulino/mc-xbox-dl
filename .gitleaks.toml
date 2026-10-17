@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Ignore test fixtures, mocks, and local virtualenv"
+paths = [
+    '''tests/.*''',
+    '''\.venv/.*''',
+]
+
