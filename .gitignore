@@ -1,0 +1,78 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing and linting
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and OS artifacts
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sensitive application session, keys, tokens, and debug dumps
+session.json
+settings.json
+cache.json
+*.token
+*.pem
+*.key
+debug/
+dumps/
+*.dump
+
+# Untracked notes and internal captures
+GEMINI.md
+*GEMINI*.md
+CAPTURA-TRAFEGO.md
+*CAPTURA*.md
+docs/CAPTURA-TRAFEGO.md
+
+# Minecraft exported worlds and temporary batch directories
+*.mcworld
+*.part
+todos_os_mundos/
+saida/
+
+# Preview UI generator
+preview_ui.py
