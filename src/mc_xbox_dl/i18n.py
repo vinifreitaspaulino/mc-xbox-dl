@@ -38,6 +38,16 @@ MESSAGES: dict[str, dict[str, str]] = {
         ),
         "help_install": "Install worlds directly into the PC Minecraft Bedrock worlds folder.",
         "help_install_dir": "Path to 'minecraftWorlds' directory (overrides auto-detection).",
+        "help_java": (
+            "Convert the downloaded world to Minecraft Java Edition format via Chunker CLI."
+        ),
+        "help_java_version": "Target Minecraft Java version for conversion (default: 1.21.4).",
+        "help_install_java": (
+            "Install converted Java world directly into local '.minecraft/saves' folder."
+        ),
+        "help_java_saves_dir": (
+            "Path to Minecraft Java 'saves' directory (overrides auto-detection)."
+        ),
         "help_force": "Overwrite existing files without asking for confirmation.",
         "help_accept_risk": (
             "Acknowledge and accept that this tool uses unofficial API flows at your own risk."
@@ -93,6 +103,7 @@ MESSAGES: dict[str, dict[str, str]] = {
             "File '{path}' already exists. Use --force to overwrite without confirmation."
         ),
         "installed_directly": "World installed directly into Minecraft Bedrock: {path}",
+        "installed_java_directly": "Java world installed into Minecraft Java saves: {path}",
         "installed_ready": "Done: world #{index} '{name}' is ready in Minecraft!",
         "minecraft_running_warning": (
             "Warning: Minecraft Bedrock is currently running.\n"
@@ -100,10 +111,35 @@ MESSAGES: dict[str, dict[str, str]] = {
             "reopening Minecraft!"
         ),
         "debug_saved": "Redacted diagnostic information saved at: {path}",
+        # Chunker / Java Conversion
+        "chunker_downloading": "Downloading Chunker CLI ({name}) from GitHub Releases...",
+        "chunker_download_progress": "Downloading chunker-cli.jar...",
+        "chunker_download_fallback": "\rDownloading chunker-cli.jar ({downloaded}/{total} KB)...",
+        "chunker_downloaded": "Chunker CLI saved at: {path}",
+        "conversion_start": (
+            "Converting world '{name}' to Minecraft Java ({version}) via Chunker CLI..."
+        ),
+        "conversion_success": "Java world converted and saved at: {path}",
+        "err_java_not_found": (
+            "Java 17+ was not found in your system PATH. "
+            "Install OpenJDK 17 or newer (https://adoptium.net) to use --java conversion."
+        ),
+        "err_java_version_too_low": (
+            "Detected Java {version}, but Chunker CLI requires Java 17 or newer. "
+            "Please upgrade your Java runtime."
+        ),
+        "err_chunker_failed": "Chunker CLI conversion failed: {details}",
+        "err_java_saves_not_found": (
+            "Could not locate a local '.minecraft' directory for Java Edition. "
+            "Launch Minecraft Java at least once or specify --java-saves-dir <PATH>."
+        ),
         # Batch Download
         "download_all_start": "Starting batch download of {total} worlds to: {dir}",
         "download_all_start_install": (
             "Starting batch download of {total} worlds to Minecraft Bedrock ({dir})"
+        ),
+        "download_all_start_java": (
+            "Starting batch download and Java conversion of {total} worlds to: {dir}"
         ),
         "download_all_saving_copies": "Saving .mcworld copies to: {dir}",
         "download_all_skipped": (
@@ -112,6 +148,9 @@ MESSAGES: dict[str, dict[str, str]] = {
         "download_all_skipped_install": (
             "[{current}/{total}] World #{index} '{name}' is already installed in Minecraft. "
             "Skipping..."
+        ),
+        "download_all_skipped_java": (
+            "[{current}/{total}] Java world #{index} '{name}' already exists. Skipping..."
         ),
         "download_all_current": "\n[{current}/{total}] Downloading world #{index}: '{name}'...",
         "download_all_error": "Error downloading world #{index} '{name}': {error}",
@@ -122,6 +161,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "summary_skipped": "↷ Already existing (skipped):",
         "summary_failures": "✗ Failures:",
         "summary_installed_loc": "Installed in Minecraft:",
+        "summary_java_loc": "Java Edition worlds:",
         "summary_mcworld_loc": "Location of .mcworld files:",
         "summary_running_notice": (
             "Notice: Minecraft Bedrock is currently running.\n"
@@ -212,6 +252,16 @@ MESSAGES: dict[str, dict[str, str]] = {
         "help_install_dir": (
             "Caminho da pasta 'minecraftWorlds' (sobrescreve a detecção automática)."
         ),
+        "help_java": (
+            "Converte o mundo baixado para o formato Minecraft Java Edition via Chunker CLI."
+        ),
+        "help_java_version": "Versão alvo do Minecraft Java para a conversão (padrão: 1.21.4).",
+        "help_install_java": (
+            "Instala o mundo Java convertido diretamente na pasta '.minecraft/saves' local."
+        ),
+        "help_java_saves_dir": (
+            "Caminho da pasta 'saves' do Minecraft Java (sobrescreve a detecção automática)."
+        ),
         "help_force": "Sobrescreve arquivos existentes sem solicitar confirmação.",
         "help_accept_risk": (
             "Declara ciência e aceita que esta ferramenta utiliza fluxos não oficiais "
@@ -277,6 +327,7 @@ MESSAGES: dict[str, dict[str, str]] = {
             "O arquivo '{path}' já existe. Use --force para sobrescrever sem confirmação."
         ),
         "installed_directly": "Mundo instalado diretamente no Minecraft Bedrock: {path}",
+        "installed_java_directly": "Mundo Java instalado em '.minecraft/saves': {path}",
         "installed_ready": "Concluído: mundo #{index} '{name}' pronto no Minecraft!",
         "minecraft_running_warning": (
             "Aviso: O Minecraft Bedrock está aberto em execução no momento.\n"
@@ -284,10 +335,35 @@ MESSAGES: dict[str, dict[str, str]] = {
             "reabrir o Minecraft!"
         ),
         "debug_saved": "Informações de diagnóstico redigidas salvas em: {path}",
+        # Chunker / Java Conversion
+        "chunker_downloading": "Baixando o Chunker CLI ({name}) do GitHub Releases...",
+        "chunker_download_progress": "Baixando chunker-cli.jar...",
+        "chunker_download_fallback": "\rBaixando chunker-cli.jar ({downloaded}/{total} KB)...",
+        "chunker_downloaded": "Chunker CLI salvo em: {path}",
+        "conversion_start": (
+            "Convertendo mundo '{name}' para Minecraft Java ({version}) via Chunker CLI..."
+        ),
+        "conversion_success": "Mundo Java convertido e salvo em: {path}",
+        "err_java_not_found": (
+            "O Java 17+ não foi encontrado no PATH do sistema. "
+            "Instale o OpenJDK 17 ou superior (https://adoptium.net) para usar --java."
+        ),
+        "err_java_version_too_low": (
+            "Java {version} detectado, mas o Chunker CLI exige Java 17 ou superior. "
+            "Atualize sua instalação do Java."
+        ),
+        "err_chunker_failed": "Falha na conversão pelo Chunker CLI: {details}",
+        "err_java_saves_not_found": (
+            "Não foi possível localizar a pasta '.minecraft' do Minecraft Java Edition. "
+            "Abra o Minecraft Java ao menos uma vez ou informe --java-saves-dir <CAMINHO>."
+        ),
         # Batch Download
         "download_all_start": "Iniciando download em lote de {total} mundos para: {dir}",
         "download_all_start_install": (
             "Iniciando download em lote de {total} mundos para o Minecraft Bedrock ({dir})"
+        ),
+        "download_all_start_java": (
+            "Iniciando download em lote e conversão Java de {total} mundos para: {dir}"
         ),
         "download_all_saving_copies": "Salvando cópias .mcworld em: {dir}",
         "download_all_skipped": (
@@ -295,6 +371,9 @@ MESSAGES: dict[str, dict[str, str]] = {
         ),
         "download_all_skipped_install": (
             "[{current}/{total}] Mundo #{index} '{name}' já está instalado no Minecraft. Pulando..."
+        ),
+        "download_all_skipped_java": (
+            "[{current}/{total}] Mundo Java #{index} '{name}' já existe. Pulando..."
         ),
         "download_all_current": "\n[{current}/{total}] Baixando mundo #{index}: '{name}'...",
         "download_all_error": "Erro ao baixar mundo #{index} '{name}': {error}",
@@ -305,6 +384,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "summary_skipped": "↷ Já existentes (pulados):",
         "summary_failures": "✗ Falhas:",
         "summary_installed_loc": "Instalados no Minecraft:",
+        "summary_java_loc": "Mundos Java Edition:",
         "summary_mcworld_loc": "Local dos arquivos .mcworld:",
         "summary_running_notice": (
             "Aviso: O Minecraft Bedrock está aberto em execução.\n"

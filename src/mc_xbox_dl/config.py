@@ -13,8 +13,23 @@ DATA_DIR: Path = Path(
     )
 )
 DEBUG_DIR: Path = DATA_DIR / "debug"
+BIN_DIR: Path = DATA_DIR / "bin"
 SESSION_FILE: Path = DATA_DIR / "session.json"
 DEFAULT_SETTINGS_FILE: Path = DATA_DIR / "settings.json"
+DEFAULT_CHUNKER_JAR: Path = BIN_DIR / "chunker-cli.jar"
+
+
+def get_chunker_jar() -> Path:
+    """Returns the path to the Chunker CLI JAR file, allowing environment override."""
+    custom_jar = os.getenv("MC_XBOX_DL_CHUNKER_JAR")
+    if custom_jar:
+        return Path(custom_jar)
+    return DEFAULT_CHUNKER_JAR
+
+
+CHUNKER_JAR: Path = get_chunker_jar()
+CHUNKER_LATEST_RELEASE_URL = "https://api.github.com/repos/HiveGamesOSS/Chunker/releases/latest"
+DEFAULT_JAVA_TARGET_VERSION = "JAVA_1_21_4"
 
 
 def get_settings_file() -> Path:
@@ -64,6 +79,10 @@ ALLOWED_HOSTS: set[str] = {
     "sisu.xboxlive.com",
     "xsts.auth.xboxlive.com",
     "titlestorage.xboxlive.com",
+    "api.github.com",
+    "github.com",
+    "objects.githubusercontent.com",
+    "release-assets.githubusercontent.com",
 }
 
 # Network timeouts (in seconds) and retry limits

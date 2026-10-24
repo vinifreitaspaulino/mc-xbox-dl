@@ -1,6 +1,14 @@
 """World assembly, validation, directory locator, and packaging module."""
 
 from mc_xbox_dl.packer.assemble import assemble_world, unpack_atom
+from mc_xbox_dl.packer.converter import (
+    check_java_runtime,
+    convert_bedrock_to_java,
+    ensure_chunker_jar,
+    get_java_saves_dir,
+    normalize_chunker_format,
+    validate_java_world_dir,
+)
 from mc_xbox_dl.packer.install import (
     get_minecraft_worlds_dir,
     install_world_dir,
@@ -22,15 +30,21 @@ from mc_xbox_dl.packer.validate import validate_world_dir
 __all__ = [
     "MinecraftProfile",
     "assemble_world",
+    "check_java_runtime",
+    "convert_bedrock_to_java",
     "create_mcworld",
+    "ensure_chunker_jar",
     "find_minecraft_profiles",
+    "get_java_saves_dir",
     "get_minecraft_worlds_dir",
     "install_world_dir",
     "is_minecraft_running",
+    "normalize_chunker_format",
     "prompt_select_profile",
     "resolve_minecraft_worlds_dir",
     "resolve_unique_filepath",
     "sanitize_filename",
     "unpack_atom",
+    "validate_java_world_dir",
     "validate_world_dir",
 ]
