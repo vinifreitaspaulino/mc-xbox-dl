@@ -501,15 +501,31 @@ def handle_download_all(
     failures: list[tuple[WorldInfo, str]] = []
 
     written_paths: set[Path] = set()
+    name_counts: dict[str, int] = {}
 
     for idx, world in enumerate(worlds, start=1):
         safe_name = sanitize_filename(world.name)
-        java_folder_name = safe_name if install_java else f"{safe_name} (Java)"
+        lookup_key = safe_name.lower()
+        occurrence = name_counts.get(lookup_key, 0)
+        name_counts[lookup_key] = occurrence + 1
+
+        suffix_part = f" ({occurrence})" if occurrence > 0 else ""
+        target_mcworld_name = f"{safe_name}{suffix_part}.mcworld"
+        target_mcworld_path = (output_dir / target_mcworld_name) if output_dir is not None else None
+
+        java_folder_name = (
+            f"{safe_name}{suffix_part}" if install_java else f"{safe_name}{suffix_part} (Java)"
+        )
         target_java_path = (java_dir / java_folder_name) if (java and java_dir) else None
+        target_install_path = (
+            (install_dir / f"{safe_name}{suffix_part}")
+            if (install and install_dir is not None)
+            else None
+        )
 
         # Resume/skip check if not force
         if not force:
-            if install and install_dir is not None and (install_dir / safe_name).exists():
+            if install and target_install_path is not None and target_install_path.exists():
                 if not java or (target_java_path is not None and target_java_path.exists()):
                     print(
                         t(
@@ -520,7 +536,7 @@ def handle_download_all(
                             name=world.name,
                         )
                     )
-                    skipped.append((world, install_dir / safe_name))
+                    skipped.append((world, target_install_path))
                     continue
             elif (
                 not install and java and target_java_path is not None and target_java_path.exists()
@@ -536,7 +552,7 @@ def handle_download_all(
                 )
                 skipped.append((world, target_java_path))
                 continue
-            elif output_dir is not None and (output_dir / f"{safe_name}.mcworld").exists():
+            elif target_mcworld_path is not None and target_mcworld_path.exists():
                 print(
                     t(
                         "download_all_skipped",
@@ -546,14 +562,15 @@ def handle_download_all(
                         name=world.name,
                     )
                 )
-                skipped.append((world, output_dir / f"{safe_name}.mcworld"))
+                skipped.append((world, target_mcworld_path))
                 continue
 
-        target_mcworld_path: Path | None = None
-        if output_dir is not None:
-            target_mcworld_path = output_dir / f"{safe_name}.mcworld"
-            if target_mcworld_path in written_paths or target_mcworld_path.exists():
-                target_mcworld_path = resolve_unique_filepath(output_dir, safe_name)
+        if target_mcworld_path is not None and target_mcworld_path in written_paths:
+            target_mcworld_path = resolve_unique_filepath(
+                output_dir,
+                target_mcworld_path.stem,
+                used_paths=written_paths,
+            )
 
         print(
             t(

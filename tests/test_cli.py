@@ -938,3 +938,76 @@ def test_cli_download_all_fail_fast_on_access_denied(
         or "Autenticação" in captured.err
         or "Authentication" in captured.err
     )
+
+
+@respx.mock
+def test_cli_download_all_duplicate_names_numbered(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    near_time = datetime(2030, 1, 1, tzinfo=timezone.utc).isoformat()
+    session = SessionData(
+        schema_version=1,
+        created_at="2026-10-15T12:00:00Z",
+        client_id="test_client",
+        auth_flow="sisu_device_code",
+        msa=MsaTokens(refresh_token="ref_tok", access_expires_at=near_time),
+        xbl=XblTokens(
+            user_hash="uhs123",
+            xuid="2814000000000000",
+            xsts_token="xsts_val",
+            xsts_expires_at=near_time,
+        ),
+    )
+    save_session(session)
+
+    list_url = (
+        f"{TITLE_STORAGE_BASE_URL}/connectedstorage/users/xuid({session.xbl.xuid})/scids/{SCID}"
+    )
+    respx.get(list_url).respond(
+        200,
+        json={
+            "blobs": [
+                {
+                    "fileName": "WORLD_D1,savedgame",
+                    "displayName": "Sobrevivencia",
+                    "size": 1000,
+                    "clientFileTime": "2026-10-15T12:00:00Z",
+                },
+                {
+                    "fileName": "WORLD_D2,savedgame",
+                    "displayName": "Sobrevivencia",
+                    "size": 2000,
+                    "clientFileTime": "2026-10-14T12:00:00Z",
+                },
+                {
+                    "fileName": "WORLD_D3,savedgame",
+                    "displayName": "Sobrevivencia",
+                    "size": 3000,
+                    "clientFileTime": "2026-10-13T12:00:00Z",
+                },
+            ]
+        },
+    )
+
+    for prefix, wid in [("WD1", "WORLD_D1"), ("WD2", "WORLD_D2"), ("WD3", "WORLD_D3")]:
+        respx.get(f"{list_url}/{wid},savedgame").respond(
+            200,
+            json={
+                "atoms": {
+                    "A1": f"{prefix}_1,binary",
+                    "A2": f"{prefix}_2,binary",
+                    "A3": f"{prefix}_3,binary",
+                    "A4": f"{prefix}_4,binary",
+                }
+            },
+        )
+        setup_world_atom_mocks(list_url, prefix, "Sobrevivencia")
+
+    out_dir = tmp_path / "mundos_duplicados"
+    code = main(["download", "--all", "-o", str(out_dir)])
+    assert code == 0
+
+    assert (out_dir / "Sobrevivencia.mcworld").is_file()
+    assert (out_dir / "Sobrevivencia (1).mcworld").is_file()
+    assert (out_dir / "Sobrevivencia (2).mcworld").is_file()

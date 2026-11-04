@@ -31,14 +31,14 @@ def test_resolve_unique_filepath(tmp_path: Path) -> None:
     assert p1 == tmp_path / "Meu Mundo.mcworld"
     p1.touch()
 
-    # 2. Already exists, should generate suffix (2)
+    # 2. Already exists, should generate suffix (1)
     p2 = resolve_unique_filepath(tmp_path, "Meu Mundo")
-    assert p2 == tmp_path / "Meu Mundo (2).mcworld"
+    assert p2 == tmp_path / "Meu Mundo (1).mcworld"
     p2.touch()
 
-    # 3. (2) already exists, should generate suffix (3)
+    # 3. (1) already exists, should generate suffix (2)
     p3 = resolve_unique_filepath(tmp_path, "Meu Mundo")
-    assert p3 == tmp_path / "Meu Mundo (3).mcworld"
+    assert p3 == tmp_path / "Meu Mundo (2).mcworld"
 
 
 def test_create_mcworld_zip_structure(tmp_path: Path) -> None:
