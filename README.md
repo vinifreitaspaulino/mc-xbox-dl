@@ -1,19 +1,19 @@
 # mc-xbox-dl
 
 [![CI](https://github.com/vinifreitaspaulino/mc-xbox-dl/actions/workflows/ci.yml/badge.svg)](https://github.com/vinifreitaspaulino/mc-xbox-dl/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: Windows | Linux](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#)
 
-> **Read this in another language:** [Português Brasileiro](README.pt-br.md)
+> **Read this in another language:** [Português Brasileiro](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/README.pt-br.md)
 
 CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** worlds saved in Xbox Live cloud storage as `.mcworld` packages or install them directly into your local PC game directory.
 
 > **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**  
 > `mc-xbox-dl` is an independent, free, open-source utility created exclusively for personal backup and data portability under user-controlled credentials. It is not affiliated with, maintained by, or endorsed by Microsoft Corporation or Mojang Studios.
 
-![mc-xbox-dl list preview](docs/assets/list-preview.png)
-![mc-xbox-dl download preview](docs/assets/download-preview.png)
+![mc-xbox-dl list preview](https://raw.githubusercontent.com/vinifreitaspaulino/mc-xbox-dl/main/docs/assets/list-preview.png)
+![mc-xbox-dl download preview](https://raw.githubusercontent.com/vinifreitaspaulino/mc-xbox-dl/main/docs/assets/download-preview.png)
 
 ---
 
@@ -23,7 +23,7 @@ CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** wor
 - **Contractual & Account Risks:** Accessing undocumented Xbox Live APIs using first-party client identifiers is not officially supported by Microsoft or Mojang. Potential risks include **endpoint changes or blocking by Microsoft**, temporary rate-limiting, or **enforcement actions (including suspension or termination of your Xbox Live / Microsoft account)** for violating the Microsoft Services Agreement. Use of this tool is strictly at your own responsibility and risk.
 - **Read-Only & Rate-Limited Design:** To minimize risk, `mc-xbox-dl` operates in **strict read-only (`GET`)** mode, transfers only your own cloud-saved worlds, enforces inter-download pacing, and immediately aborts (`fail-fast`) upon encountering HTTP `401`, `403`, or `429`.
 - **Explicit Consent Required:** Running `mc-xbox-dl login` requires explicit interactive risk acceptance, or the `--accept-risk` flag for automated scripts.
-- **Local-First Privacy:** All credentials and tokens are stored locally on your machine (`%APPDATA%\mc-xbox-dl` on Windows or `~/.config/mc-xbox-dl` on Linux). No data is sent to third parties or external telemetry servers. See [SECURITY.md](SECURITY.md) for details.
+- **Local-First Privacy:** All credentials and tokens are stored locally on your machine (`%APPDATA%\mc-xbox-dl` on Windows or `~/.config/mc-xbox-dl` on Linux). No data is sent to third parties or external telemetry servers. See [SECURITY.md](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/SECURITY.md) for details.
 
 ---
 
@@ -268,14 +268,14 @@ ruff format --check .
 ---
 
 ## Documentation Links
-- [Português Brasileiro (README.pt-br.md)](README.pt-br.md)
-- [Changelog (CHANGELOG.md)](CHANGELOG.md)
-- [Security Policy (SECURITY.md)](SECURITY.md)
-- [Architecture & Technical Decisions (docs/DECISIONS.md)](docs/DECISIONS.md)
-- [Protocol & Endpoint Research (docs/RESEARCH.md)](docs/RESEARCH.md)
-- [Connected Storage Protocol Specification (docs/PROTOCOL.md)](docs/PROTOCOL.md)
+- [Português Brasileiro (README.pt-br.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/README.pt-br.md)
+- [Changelog (CHANGELOG.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/CHANGELOG.md)
+- [Security Policy (SECURITY.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/SECURITY.md)
+- [Architecture & Technical Decisions (docs/DECISIONS.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/DECISIONS.md)
+- [Protocol & Endpoint Research (docs/RESEARCH.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/RESEARCH.md)
+- [Connected Storage Protocol Specification (docs/PROTOCOL.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/PROTOCOL.md)
 
 ---
 
 ## License
-Distributed under the MIT License. See [LICENSE](LICENSE) for details.
+Distributed under the MIT License. See [LICENSE](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/LICENSE) for details.
