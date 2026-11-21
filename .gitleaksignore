@@ -1,0 +1,5 @@
+# Gitleaks ignore file for false positives in test fixtures
+fd1b82eff0d99d24557e2432ef99f68df73c837a:tests/test_redact.py:jwt:72
+fd1b82eff0d99d24557e2432ef99f68df73c837a:tests/test_http.py:generic-api-key:56
+fd1b82eff0d99d24557e2432ef99f68df73c837a:tests/test_http.py:generic-api-key:57
+

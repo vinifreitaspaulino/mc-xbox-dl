@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
@@ -126,13 +126,14 @@ class HttpClient:
         self.close()
 
     def _validate_host(self, url: str) -> None:
-        """Ensures the requested URL belongs to the allowed list of Microsoft/Xbox domains."""
+        """Ensures the requested URL belongs to the allowed list of domains."""
         parsed = urlparse(url)
-        host = parsed.hostname
-        if not host or host.lower() not in ALLOWED_HOSTS:
+        host = (parsed.hostname or "").lower()
+        is_allowed = host in ALLOWED_HOSTS or host.endswith(".githubusercontent.com")
+        if not host or not is_allowed:
             raise AccessDeniedError(
                 f"Unauthorized destination: {host}. "
-                "Requests are restricted strictly to Microsoft/Xbox domains."
+                "Requests are restricted strictly to allowed Microsoft/Xbox/GitHub domains."
             )
 
     def request(
@@ -147,97 +148,144 @@ class HttpClient:
         content: Any = None,
         stream: bool = False,
         raise_for_status: bool = False,
+        follow_redirects: bool = False,
     ) -> httpx.Response:
-        self._validate_host(url)
-
-        attempt = 0
-        backoff = 1.0
+        current_url = url
+        current_method = method
+        current_params = params
+        current_data = data
+        current_json = json_data
+        current_content = content
+        redirect_count = 0
+        max_redirects = 5
 
         while True:
-            attempt += 1
-            response: httpx.Response | None = None
-            try:
-                req = self.client.build_request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    headers=headers,
-                    data=data,
-                    json=json_data,
-                    content=content,
-                )
+            self._validate_host(current_url)
 
-                if stream:
-                    response = self.client.send(req, stream=True)
-                else:
-                    response = self.client.send(req)
+            attempt = 0
+            backoff = 1.0
 
-                if self.debug:
-                    _dump_debug_exchange(req, response)
-
-                # Rate limiting handler (HTTP 429)
-                if response.status_code == 429 and attempt <= self.max_retries:
-                    retry_after = response.headers.get("Retry-After")
-                    sleep_time = (
-                        float(retry_after) if retry_after and retry_after.isdigit() else backoff
+            while True:
+                attempt += 1
+                response: httpx.Response | None = None
+                try:
+                    req = self.client.build_request(
+                        method=current_method,
+                        url=current_url,
+                        params=current_params,
+                        headers=headers,
+                        data=current_data,
+                        json=current_json,
+                        content=current_content,
                     )
-                    logger.warning(
-                        "Rate limit reached (429). Retrying in %ss...",
-                        sleep_time,
-                    )
-                    time.sleep(sleep_time)
-                    backoff *= 2.0
-                    continue
 
-                # Transient server errors (5xx)
-                if 500 <= response.status_code <= 599 and attempt <= self.max_retries:
-                    logger.warning(
-                        "Server unavailable (HTTP %s). Attempt %s/%s in %ss...",
-                        response.status_code,
-                        attempt,
-                        self.max_retries,
-                        backoff,
-                    )
-                    time.sleep(backoff)
-                    backoff *= 2.0
-                    continue
+                    if stream:
+                        response = self.client.send(req, stream=True)
+                    else:
+                        response = self.client.send(req)
 
-                if raise_for_status:
-                    if response.status_code in (401, 403):
-                        raise AccessDeniedError(
-                            f"Access denied by Microsoft servers (HTTP {response.status_code})."
+                    if self.debug and not stream:
+                        _dump_debug_exchange(req, response)
+
+                    # Rate limiting handler (HTTP 429)
+                    if response.status_code == 429 and attempt <= self.max_retries:
+                        if stream:
+                            response.close()
+                        retry_after = response.headers.get("Retry-After")
+                        sleep_time = (
+                            float(retry_after) if retry_after and retry_after.isdigit() else backoff
                         )
-                    if response.is_error:
-                        response.raise_for_status()
+                        logger.warning(
+                            "Rate limit reached (429). Retrying in %ss...",
+                            sleep_time,
+                        )
+                        time.sleep(sleep_time)
+                        backoff *= 2.0
+                        continue
 
-                return response
+                    # Transient server errors (5xx)
+                    if 500 <= response.status_code <= 599 and attempt <= self.max_retries:
+                        if stream:
+                            response.close()
+                        logger.warning(
+                            "Server unavailable (HTTP %s). Attempt %s/%s in %ss...",
+                            response.status_code,
+                            attempt,
+                            self.max_retries,
+                            backoff,
+                        )
+                        time.sleep(backoff)
+                        backoff *= 2.0
+                        continue
 
-            except httpx.TimeoutException as exc:
-                if self.debug:
-                    _dump_debug_exchange(req, response, exc)
-                if attempt <= self.max_retries:
-                    logger.warning(
-                        "Request timed out. Attempt %s/%s in %ss...",
-                        attempt,
-                        self.max_retries,
-                        backoff,
+                    break
+
+                except httpx.TimeoutException as exc:
+                    if self.debug:
+                        _dump_debug_exchange(req, response, exc)
+                    if attempt <= self.max_retries:
+                        logger.warning(
+                            "Request timed out. Attempt %s/%s in %ss...",
+                            attempt,
+                            self.max_retries,
+                            backoff,
+                        )
+                        time.sleep(backoff)
+                        backoff *= 2.0
+                        continue
+                    raise NetworkError("Connection to remote servers timed out.") from exc
+
+                except httpx.NetworkError as exc:
+                    if self.debug:
+                        _dump_debug_exchange(req, response, exc)
+                    if attempt <= self.max_retries:
+                        logger.warning(
+                            "Transient network error. Attempt %s/%s in %ss...",
+                            attempt,
+                            self.max_retries,
+                            backoff,
+                        )
+                        time.sleep(backoff)
+                        backoff *= 2.0
+                        continue
+                    raise NetworkError(f"Network communication failure: {exc}") from exc
+
+            # Controlled redirect handling restricted strictly to ALLOWED_HOSTS
+            if (
+                follow_redirects
+                and response.status_code in (301, 302, 303, 307, 308)
+                and "Location" in response.headers
+            ):
+                location = response.headers["Location"]
+                if stream:
+                    response.close()
+                redirect_count += 1
+                if redirect_count > max_redirects:
+                    raise NetworkError("Maximum HTTP redirect limit exceeded.")
+                next_url = urljoin(current_url, location)
+                self._validate_host(next_url)
+                current_url = next_url
+                current_params = None
+                if response.status_code in (301, 302, 303) and current_method not in (
+                    "GET",
+                    "HEAD",
+                ):
+                    current_method = "GET"
+                    current_data = None
+                    current_json = None
+                    current_content = None
+                continue
+
+            if raise_for_status:
+                if response.status_code in (401, 403):
+                    if stream:
+                        response.close()
+                    raise AccessDeniedError(
+                        f"Access denied by remote servers (HTTP {response.status_code})."
                     )
-                    time.sleep(backoff)
-                    backoff *= 2.0
-                    continue
-                raise NetworkError("Connection to Microsoft servers timed out.") from exc
+                if response.is_error:
+                    if stream:
+                        response.close()
+                    response.raise_for_status()
 
-            except httpx.NetworkError as exc:
-                if self.debug:
-                    _dump_debug_exchange(req, response, exc)
-                if attempt <= self.max_retries:
-                    logger.warning(
-                        "Transient network error. Attempt %s/%s in %ss...",
-                        attempt,
-                        self.max_retries,
-                        backoff,
-                    )
-                    time.sleep(backoff)
-                    backoff *= 2.0
-                    continue
-                raise NetworkError(f"Network communication failure: {exc}") from exc
+            return response

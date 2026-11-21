@@ -52,3 +52,9 @@ class RateLimitError(McXboxDlError):
     """API rate limit encountered (HTTP 429)."""
 
     exit_code = 8
+
+
+class ConversionError(McXboxDlError):
+    """Failure during Java runtime check, Chunker download, or Bedrock-to-Java conversion."""
+
+    exit_code = 9

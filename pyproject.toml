@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mc-xbox-dl"
-version = "0.1.0"
+version = "0.2.0"
 description = "CLI tool to list, download, and backup Minecraft Bedrock (Xbox) cloud saves as .mcworld packages"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -34,6 +34,11 @@ dev = [
     "respx>=0.21.0",
     "ruff>=0.1.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/vinifreitaspaulino/mc-xbox-dl.git"
+Issues = "https://github.com/vinifreitaspaulino/mc-xbox-dl/issues"
+Changelog = "https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/CHANGELOG.md"
 
 [project.scripts]
 mc-xbox-dl = "mc_xbox_dl.cli:main"

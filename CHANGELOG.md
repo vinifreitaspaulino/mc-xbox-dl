@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-21
+
+### Added
+- **Minecraft Java Edition Conversion (`--java`, `--java-version`, `--install-java`, `--java-saves-dir`):**
+  - Integrated official open-source [Chunker CLI](https://github.com/HiveGamesOSS/Chunker) (`HiveGamesOSS/Chunker`) for Bedrock-to-Java world conversion.
+  - Automatic download, progress display, and caching of `chunker-cli.jar` in `DATA_DIR / "bin"`.
+  - Java runtime validation (`java -version`) ensuring Java 17+ requirement before starting conversions.
+  - User-friendly target Java version parsing (e.g. `1.21.4`, `1.20.1`, `JAVA_1_21_4`).
+  - Automatic detection and installation into `.minecraft/saves` for both Windows (`%APPDATA%\.minecraft\saves`) and Linux (native `~/.minecraft/saves` and Flatpak paths).
+  - Structural validation of converted Java worlds (`level.dat` gzip magic bytes `0x1F 0x8B` and `region/` directory).
+  - New domain exception `ConversionError` with exit code `9`.
+  - Added support for safe HTTP redirects across GitHub Releases and GitHub CDN assets (`*.githubusercontent.com`).
+
+### Fixed
+- **Batch Download Duplicate World Names (`--all`):** Differentiate worlds sharing the same name with sequential suffixes (e.g., `World (1).mcworld`) by tracking used output paths in `resolve_unique_filepath`.
+- **Terminal Encoding Compatibility:** Updated i18n batch summary status labels to plain ASCII (`[OK]`, `[SKIP]`, `[ERRO]`) to avoid encoding issues across Windows and Linux terminals.
+
+### Changed
+- **PyPI Packaging Preparation:** Added `[project.urls]` metadata (`Repository`, `Issues`, `Changelog`) to `pyproject.toml` and converted relative image and documentation links in `README.md` to absolute GitHub URLs.
+
 ## [0.1.0] - 2026-10-16 — Initial Release
 
 ### Added

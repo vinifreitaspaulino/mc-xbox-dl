@@ -30,21 +30,26 @@ def sanitize_filename(name: str) -> str:
     return cleaned[:100].rstrip(". ")
 
 
-def resolve_unique_filepath(output_dir: Path, base_name: str, suffix: str = ".mcworld") -> Path:
+def resolve_unique_filepath(
+    output_dir: Path,
+    base_name: str,
+    suffix: str = ".mcworld",
+    used_paths: set[Path] | None = None,
+) -> Path:
     """
     Returns a unique file path within output_dir to prevent collisions
     between distinct worlds sharing identical names.
-    Example: World.mcworld, World (2).mcworld, World (3).mcworld, etc.
+    Example: World.mcworld, World (1).mcworld, World (2).mcworld, etc.
     """
     clean_name = sanitize_filename(base_name)
     candidate = output_dir / f"{clean_name}{suffix}"
-    if not candidate.exists():
+    if not candidate.exists() and (used_paths is None or candidate not in used_paths):
         return candidate
 
-    counter = 2
+    counter = 1
     while True:
         candidate = output_dir / f"{clean_name} ({counter}){suffix}"
-        if not candidate.exists():
+        if not candidate.exists() and (used_paths is None or candidate not in used_paths):
             return candidate
         counter += 1
 

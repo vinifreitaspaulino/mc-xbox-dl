@@ -104,3 +104,16 @@
 - **Source/Evidence:** Live world packaging and Bedrock import testing.
 - **Status:** Confirmed.
 
+---
+
+## D-011 — Minecraft Bedrock to Java Edition Conversion via Chunker CLI
+- **Date:** 2026-10-22
+- **Context:** Bedrock worlds use LevelDB storage and custom NBT encoding incompatible with Minecraft Java Edition (Anvil region files and gzip NBT). Users wanting to play their Xbox worlds on Java Edition require format conversion without paid tools or third-party servers.
+- **Decision:** Integrate the official open-source Chunker CLI (`HiveGamesOSS/Chunker`). Auto-download `chunker-cli-*.jar` from GitHub Releases into `%APPDATA%\mc-xbox-dl\bin\` with atomic write and caching. Require Java 17+ (validated via `java -version`), validate Java post-conversion structure (`level.dat` gzip magic bytes `0x1F 0x8B` and `region/`), support automatic installation into `.minecraft/saves` (Windows & Linux standard/Flatpak), and expand `ALLOWED_HOSTS` to support GitHub asset CDN redirection (`*.githubusercontent.com`).
+- **Discarded Alternatives:**
+  - *Third-party cloud conversion APIs:* Violates L1/L5/L10 (requires telemetry/third-party servers).
+  - *Python-based LevelDB-to-Anvil converter:* High maintenance burden and potential data loss compared to the official Chunker engine maintained by HiveGames/Mojang partners.
+- **Source/Evidence:** `HiveGamesOSS/Chunker` repository and successful conversion/validation on Java 17+.
+- **Status:** Confirmed.
+
+

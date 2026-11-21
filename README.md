@@ -1,19 +1,19 @@
 # mc-xbox-dl
 
 [![CI](https://github.com/vinifreitaspaulino/mc-xbox-dl/actions/workflows/ci.yml/badge.svg)](https://github.com/vinifreitaspaulino/mc-xbox-dl/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: Windows | Linux](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#)
 
-> **Read this in another language:** [Português Brasileiro](README.pt-br.md)
+> **Read this in another language:** [Português Brasileiro](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/README.pt-br.md)
 
 CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** worlds saved in Xbox Live cloud storage as `.mcworld` packages or install them directly into your local PC game directory.
 
 > **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**  
 > `mc-xbox-dl` is an independent, free, open-source utility created exclusively for personal backup and data portability under user-controlled credentials. It is not affiliated with, maintained by, or endorsed by Microsoft Corporation or Mojang Studios.
 
-![mc-xbox-dl list preview](docs/assets/list-preview.png)
-![mc-xbox-dl download preview](docs/assets/download-preview.png)
+![mc-xbox-dl list preview](https://raw.githubusercontent.com/vinifreitaspaulino/mc-xbox-dl/main/docs/assets/list-preview.png)
+![mc-xbox-dl download preview](https://raw.githubusercontent.com/vinifreitaspaulino/mc-xbox-dl/main/docs/assets/download-preview.png)
 
 ---
 
@@ -23,7 +23,7 @@ CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** wor
 - **Contractual & Account Risks:** Accessing undocumented Xbox Live APIs using first-party client identifiers is not officially supported by Microsoft or Mojang. Potential risks include **endpoint changes or blocking by Microsoft**, temporary rate-limiting, or **enforcement actions (including suspension or termination of your Xbox Live / Microsoft account)** for violating the Microsoft Services Agreement. Use of this tool is strictly at your own responsibility and risk.
 - **Read-Only & Rate-Limited Design:** To minimize risk, `mc-xbox-dl` operates in **strict read-only (`GET`)** mode, transfers only your own cloud-saved worlds, enforces inter-download pacing, and immediately aborts (`fail-fast`) upon encountering HTTP `401`, `403`, or `429`.
 - **Explicit Consent Required:** Running `mc-xbox-dl login` requires explicit interactive risk acceptance, or the `--accept-risk` flag for automated scripts.
-- **Local-First Privacy:** All credentials and tokens are stored locally on your machine (`%APPDATA%\mc-xbox-dl` on Windows or `~/.config/mc-xbox-dl` on Linux). No data is sent to third parties or external telemetry servers. See [SECURITY.md](SECURITY.md) for details.
+- **Local-First Privacy:** All credentials and tokens are stored locally on your machine (`%APPDATA%\mc-xbox-dl` on Windows or `~/.config/mc-xbox-dl` on Linux). No data is sent to third parties or external telemetry servers. See [SECURITY.md](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/SECURITY.md) for details.
 
 ---
 
@@ -35,6 +35,7 @@ CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** wor
 - **Cloud World Listing with Caching:** Fast inspection of world names, modification dates, and sizes with 5-minute local caching (`--no-cache` to force a live refresh).
 - **Single & Batch Downloads:** Download individual worlds by index, name, or ID, or batch export all cloud saves (`--all`) with automatic resume and rate-paced transfers.
 - **Direct PC Installation (`--install`):** Automatically detects modern **GDK** (`%APPDATA%\Minecraft Bedrock\Users\<ID>\...`) and legacy **UWP** (`%LOCALAPPDATA%\Packages\Microsoft.MinecraftUWP_...\...`) installations on Windows, extracting worlds directly into `minecraftWorlds`.
+- **Automatic Minecraft Java Edition Conversion (`--java`, `--install-java`):** Automatically downloads and runs the official [Chunker CLI](https://github.com/HiveGamesOSS/Chunker) (`HiveGamesOSS/Chunker`) to convert Xbox Bedrock worlds into Minecraft Java Edition worlds and optionally install them directly into `.minecraft/saves` on Windows and Linux.
 - **Cross-Platform Support (Windows & Linux):** Native `.mcworld` export on both Windows and Linux, with helpful path guidance for Linux Bedrock launchers (`mcpelauncher`) when `--install` is used.
 - **Structural Integrity Validation:** Verifies Bedrock NBT headers (`level.dat`), world title (`levelname.txt`), and LevelDB database files (`db/CURRENT`, `db/MANIFEST-*`) before completing any package or installation.
 - **Network Safeguards & Fail-Fast:** Enforces request pacing between batch downloads, uses neutral HTTP headers, and immediately aborts on HTTP `401`, `403`, or `429`.
@@ -47,6 +48,7 @@ CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** wor
 - **Python 3.11 or higher:** Download from [python.org](https://www.python.org/downloads/) or via your Linux package manager.
   > **Windows Note:** On the first screen of the Python installer, check **"Add python.exe to PATH"** before clicking *Install Now*.
 - **Git** (optional; you can also download the repository as a `.zip` archive).
+- **Java 17 or higher** *(optional — required only if using `--java` or `--install-java` for Minecraft Java Edition conversion)*: Download OpenJDK 17+ from [Adoptium Temurin](https://adoptium.net/) or install via your package manager.
 
 ### 2. Clone and Set Up Virtual Environment
 
@@ -159,6 +161,32 @@ mc-xbox-dl download 1 --install-dir "C:\CustomPath\games\com.mojang\minecraftWor
 4. **Atomic Staging & Validation:** Worlds are assembled in a temporary staging directory, checked for `level.dat`, `levelname.txt`, and `db/`, and atomically moved into `minecraftWorlds`.
 5. **Linux Behavior:** On Linux, running `--install` (without `--install-dir`) safely exports the `.mcworld` file to your output folder and displays a notice with standard `mcpelauncher` world directories (`~/.var/app/io.mrarm.mcpelauncher/...` and `~/.local/share/mcpelauncher/...`).
 
+#### Option D: Convert to Minecraft Java Edition (`--java`, `--install-java`)
+Using the official [Chunker CLI](https://github.com/HiveGamesOSS/Chunker), `mc-xbox-dl` can convert downloaded Bedrock worlds directly into Minecraft Java Edition format (requires **Java 17+** in your `PATH`; `chunker-cli.jar` is downloaded and cached automatically on first run):
+```bash
+# Convert world #1 to a Java Edition world folder in the current directory (./<World Name> (Java)/)
+mc-xbox-dl download 1 --java
+
+# Convert world #1 targeting a specific Minecraft Java version (default: 1.21.4)
+mc-xbox-dl download 1 --java --java-version 1.20.6 -o ./java_worlds
+
+# Convert and install world #1 directly into your local '.minecraft/saves' folder (Windows & Linux)
+mc-xbox-dl download 1 --install-java
+
+# Install into BOTH Minecraft Bedrock AND Minecraft Java Edition simultaneously
+mc-xbox-dl download 1 --install --install-java
+
+# Convert and install into a custom Java 'saves' directory
+mc-xbox-dl download 1 --java-saves-dir "D:\MultiMC\instances\1.21.4\.minecraft\saves"
+
+# Install into Java Edition AND keep an original .mcworld Bedrock backup copy in ./backups
+mc-xbox-dl download 1 --install-java -o ./backups
+```
+
+**How `-o` / `--output` behaves with `--java`:**
+- **With `--java` alone (without installation):** `-o` specifies the destination directory for the converted Java world folder (e.g. `./output/<World Name> (Java)/`). No `.mcworld` file is generated.
+- **With `--install-java`:** The Java world is placed directly in `.minecraft/saves`. If `-o` is also passed, it saves an additional `.mcworld` backup copy in that folder. If `-o` is omitted, no extra files remain in your working directory.
+
 ### 5. Play Your World in Minecraft
 - **If you exported a `.mcworld` file:** Double-click the `.mcworld` file in your file manager to import it into Minecraft Bedrock.
 - **If you used `--install` on Windows:** Launch Minecraft Bedrock (or restart the game if it was already running) and the world will appear directly in your worlds list.
@@ -199,6 +227,8 @@ mc-xbox-dl --lang en list     # Switch to English and save preference
 | `5` | World not found or cloud storage list is empty |
 | `6` | World assembly, integrity validation, or packaging error |
 | `7` | Access denied (`401` / `403`) by Xbox Live |
+| `8` | Xbox Live rate limit encountered (`429`) |
+| `9` | Java runtime missing/outdated, Chunker CLI download failure, or Java conversion error (`ConversionError`) |
 
 ---
 
@@ -238,14 +268,14 @@ ruff format --check .
 ---
 
 ## Documentation Links
-- [Português Brasileiro (README.pt-br.md)](README.pt-br.md)
-- [Changelog (CHANGELOG.md)](CHANGELOG.md)
-- [Security Policy (SECURITY.md)](SECURITY.md)
-- [Architecture & Technical Decisions (docs/DECISIONS.md)](docs/DECISIONS.md)
-- [Protocol & Endpoint Research (docs/RESEARCH.md)](docs/RESEARCH.md)
-- [Connected Storage Protocol Specification (docs/PROTOCOL.md)](docs/PROTOCOL.md)
+- [Português Brasileiro (README.pt-br.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/README.pt-br.md)
+- [Changelog (CHANGELOG.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/CHANGELOG.md)
+- [Security Policy (SECURITY.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/SECURITY.md)
+- [Architecture & Technical Decisions (docs/DECISIONS.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/DECISIONS.md)
+- [Protocol & Endpoint Research (docs/RESEARCH.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/RESEARCH.md)
+- [Connected Storage Protocol Specification (docs/PROTOCOL.md)](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/docs/PROTOCOL.md)
 
 ---
 
 ## License
-Distributed under the MIT License. See [LICENSE](LICENSE) for details.
+Distributed under the MIT License. See [LICENSE](https://github.com/vinifreitaspaulino/mc-xbox-dl/blob/main/LICENSE) for details.

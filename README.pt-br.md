@@ -35,6 +35,7 @@ Ferramenta de linha de comando (CLI) para listar, exportar e baixar mundos pesso
 - **Listagem de Mundos com Cache:** Consulta rápida de nomes, datas de modificação e tamanhos com cache local inteligente de 5 minutos (`--no-cache` para forçar atualização em tempo real).
 - **Download Individual e em Lote:** Baixe mundos específicos por índice, nome ou ID, ou exporte todos os mundos da nuvem (`--all`) com retomada automática e controle de taxa entre transferências.
 - **Instalação Direta no PC (`--install`):** Detecta automaticamente instalações modernas **GDK** (`%APPDATA%\Minecraft Bedrock\Users\<ID>\...`) e legadas **UWP** (`%LOCALAPPDATA%\Packages\Microsoft.MinecraftUWP_...\...`) no Windows, extraindo os mundos diretamente na pasta `minecraftWorlds`.
+- **Conversão Automática para Minecraft Java Edition (`--java`, `--install-java`):** Baixa e executa automaticamente o [Chunker CLI](https://github.com/HiveGamesOSS/Chunker) oficial (`HiveGamesOSS/Chunker`) para converter mundos do Xbox (Bedrock) para o formato Minecraft Java Edition e, opcionalmente, instalá-los diretamente em `.minecraft/saves` no Windows e no Linux.
 - **Suporte Multiplataforma (Windows e Linux):** Exportação nativa de arquivos `.mcworld` tanto no Windows quanto no Linux, exibindo orientações claras sobre os diretórios de launchers Bedrock no Linux (`mcpelauncher`) quando `--install` é utilizado.
 - **Validação de Integridade Estrutural:** Verifica os cabeçalhos NBT do Bedrock (`level.dat`), o título do mundo (`levelname.txt`) e os arquivos do banco LevelDB (`db/CURRENT`, `db/MANIFEST-*`) antes de concluir qualquer pacote ou instalação.
 - **Proteções de Rede e Parada Imediata (Fail-Fast):** Pausa controlada entre downloads em lote, cabeçalhos HTTP neutros e interrupção imediata de segurança caso a API retorne status HTTP `401`, `403` ou `429`.
@@ -47,6 +48,7 @@ Ferramenta de linha de comando (CLI) para listar, exportar e baixar mundos pesso
 - **Python 3.11 ou superior:** Baixe em [python.org](https://www.python.org/downloads/) ou instale pelo gerenciador de pacotes da sua distribuição Linux.
   > **Nota para Windows:** Na primeira tela do instalador do Python, marque a opção **"Add python.exe to PATH"** antes de clicar em *Install Now*.
 - **Git** (opcional; você também pode baixar o repositório como arquivo `.zip`).
+- **Java 17 ou superior** *(opcional — necessário apenas para quem utilizar `--java` ou `--install-java` na conversão para Minecraft Java Edition)*: Baixe o OpenJDK 17+ em [Adoptium Temurin](https://adoptium.net/) ou instale pelo gerenciador de pacotes do seu sistema.
 
 ### 2. Clonar e Configurar o Ambiente Virtual
 
@@ -159,6 +161,32 @@ mc-xbox-dl download 1 --install-dir "C:\CaminhoCustomizado\games\com.mojang\mine
 4. **Extração Atômica com Staging:** Os arquivos são montados em uma pasta temporária, validados (`level.dat`, `levelname.txt` e `db/`) e movidos atomicamente para `minecraftWorlds`.
 5. **Comportamento no Linux:** No Linux, usar `--install` (sem `--install-dir`) gera normalmente o pacote `.mcworld` na pasta de saída e exibe um painel informativo com os caminhos padrão do `mcpelauncher` (`~/.var/app/io.mrarm.mcpelauncher/...` e `~/.local/share/mcpelauncher/...`).
 
+#### Opção D: Converter para Minecraft Java Edition (`--java`, `--install-java`)
+Utilizando o [Chunker CLI](https://github.com/HiveGamesOSS/Chunker) oficial, o `mc-xbox-dl` pode converter automaticamente os mundos Bedrock baixados para o formato do **Minecraft Java Edition** (requer **Java 17+** no `PATH`; o binário `chunker-cli.jar` é baixado e salvo em cache automaticamente na primeira execução):
+```bash
+# Converter o mundo #1 para uma pasta Java Edition no diretório atual (./<Nome do Mundo> (Java)/)
+mc-xbox-dl download 1 --java
+
+# Converter o mundo #1 especificando a versão alvo do Minecraft Java (padrão: 1.21.4)
+mc-xbox-dl download 1 --java --java-version 1.20.6 -o ./mundos_java
+
+# Converter e instalar o mundo #1 diretamente na pasta '.minecraft/saves' local (Windows e Linux)
+mc-xbox-dl download 1 --install-java
+
+# Instalar simultaneamente no Minecraft Bedrock E no Minecraft Java Edition
+mc-xbox-dl download 1 --install --install-java
+
+# Converter e instalar em uma pasta 'saves' customizada do Minecraft Java
+mc-xbox-dl download 1 --java-saves-dir "D:\MultiMC\instances\1.21.4\.minecraft\saves"
+
+# Instalar no Java Edition E TAMBÉM salvar uma cópia de backup do .mcworld Bedrock em ./backups
+mc-xbox-dl download 1 --install-java -o ./backups
+```
+
+**Comportamento do `-o` / `--output` com `--java`:**
+- **Apenas `--java` (sem instalação):** `-o` define onde a pasta do mundo Java será salva (ex.: `./saida/<Nome do Mundo> (Java)/`). O arquivo `.mcworld` não é gerado.
+- **Com `--install-java`:** O mundo Java é colocado direto no `.minecraft/saves`. Se `-o` também for passado, ele salva uma cópia extra de backup em `.mcworld` nessa pasta. Se `-o` for omitido, nenhum arquivo residual é criado na pasta de trabalho.
+
 ### 5. Jogar no Minecraft
 - **Se você exportou um arquivo `.mcworld`:** Dê um duplo clique no arquivo `.mcworld` pelo gerenciador de arquivos para importá-lo automaticamente no Minecraft Bedrock.
 - **Se você usou `--install` no Windows:** Abra o Minecraft Bedrock (ou reinicie o jogo caso ele já estivesse aberto durante a instalação) e o mundo aparecerá imediatamente na sua lista de mundos.
@@ -199,6 +227,8 @@ mc-xbox-dl --lang en list     # Altera para Inglês e salva a preferência
 | `5` | Mundo não encontrado ou nenhum mundo sincronizado na nuvem |
 | `6` | Falha na montagem, validação de integridade ou empacotamento do mundo |
 | `7` | Acesso negado (`401` / `403`) pela Xbox Live |
+| `8` | Limite de requisições (`429`) da Xbox Live atingido |
+| `9` | Ambiente Java ausente/desatualizado, falha no download do Chunker CLI ou erro na conversão para Java (`ConversionError`) |
 
 ---
 
