@@ -26,6 +26,7 @@ dependencies = [
     "httpx>=0.25.0",
     "platformdirs>=3.0.0",
     "rich>=13.0.0",
+    "segno>=1.6.0",
 ]
 
 [project.optional-dependencies]
