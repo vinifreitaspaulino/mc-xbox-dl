@@ -50,7 +50,22 @@ Ferramenta de linha de comando (CLI) para listar, exportar e baixar mundos pesso
 - **Git** (opcional; você também pode baixar o repositório como arquivo `.zip`).
 - **Java 17 ou superior** *(opcional — necessário apenas para quem utilizar `--java` ou `--install-java` na conversão para Minecraft Java Edition)*: Baixe o OpenJDK 17+ em [Adoptium Temurin](https://adoptium.net/) ou instale pelo gerenciador de pacotes do seu sistema.
 
-### 2. Clonar e Configurar o Ambiente Virtual
+### 2. Instalação Rápida pelo PyPI (Recomendado)
+
+Usando o [pipx](https://pipx.pypa.io/), o `mc-xbox-dl` é instalado em um ambiente isolado e fica disponível globalmente no seu terminal:
+
+```bash
+# Instalar o pipx (caso ainda não tenha)
+python -m pip install --user pipx
+python -m pipx ensurepath
+
+# Instalar o mc-xbox-dl pelo PyPI
+pipx install mc-xbox-dl
+```
+
+> **Dica:** Após rodar `ensurepath`, feche e abra o terminal novamente para que o comando `mc-xbox-dl` seja reconhecido. Para atualizar no futuro, execute `pipx upgrade mc-xbox-dl`.
+
+### 3. Instalar a partir do Código-Fonte (Alternativa)
 
 #### No Windows (PowerShell):
 ```powershell

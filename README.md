@@ -50,7 +50,22 @@ CLI tool to list, export, and download personal **Minecraft Bedrock (Xbox)** wor
 - **Git** (optional; you can also download the repository as a `.zip` archive).
 - **Java 17 or higher** *(optional — required only if using `--java` or `--install-java` for Minecraft Java Edition conversion)*: Download OpenJDK 17+ from [Adoptium Temurin](https://adoptium.net/) or install via your package manager.
 
-### 2. Clone and Set Up Virtual Environment
+### 2. Quick Install from PyPI (Recommended)
+
+Using [pipx](https://pipx.pypa.io/) installs `mc-xbox-dl` in an isolated environment and makes the command available globally in your terminal:
+
+```bash
+# Install pipx (if you don't have it yet)
+python -m pip install --user pipx
+python -m pipx ensurepath
+
+# Install mc-xbox-dl from PyPI
+pipx install mc-xbox-dl
+```
+
+> **Tip:** After running `ensurepath`, restart your terminal so the `mc-xbox-dl` command is recognized. To update later, run `pipx upgrade mc-xbox-dl`.
+
+### 3. Install from Source (Alternative)
 
 #### On Windows (PowerShell):
 ```powershell

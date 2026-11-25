@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 from mc_xbox_dl.auth.msa import poll_device_code, refresh_msa_token, request_device_code
+from mc_xbox_dl.auth.qr import display_login_prompt
 from mc_xbox_dl.auth.signer import generate_keypair
 from mc_xbox_dl.auth.sisu import authenticate_device, authorize_sisu
 from mc_xbox_dl.config import CLIENT_ID
@@ -49,7 +50,11 @@ def login_flow(http_client: HttpClient, client_id: str | None = None) -> Session
         url=dev_code_resp.verification_uri,
         code=dev_code_resp.user_code,
     )
-    print(prompt, flush=True)
+    display_login_prompt(
+        url=dev_code_resp.verification_uri,
+        code=dev_code_resp.user_code,
+        fallback_text=prompt,
+    )
 
     msa_resp = poll_device_code(
         http_client,

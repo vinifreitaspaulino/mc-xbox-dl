@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mc-xbox-dl"
-version = "0.2.0"
+version = "0.2.1"
 description = "CLI tool to list, download, and backup Minecraft Bedrock (Xbox) cloud saves as .mcworld packages"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -26,6 +26,7 @@ dependencies = [
     "httpx>=0.25.0",
     "platformdirs>=3.0.0",
     "rich>=13.0.0",
+    "segno>=1.6.0",
 ]
 
 [project.optional-dependencies]
