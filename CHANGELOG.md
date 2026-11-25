@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-11-25
+
+### Added
+- **Terminal QR Code for Device Code Login:**
+  - Added compact half-block QR Code rendering via `segno` and `rich` in `mc_xbox_dl.auth.qr` during `mc-xbox-dl login`.
+  - Localized panel prompts in English (`en`) and Portuguese (`pt`) with clickable verification URL and device code.
+  - Symmetrical 2-module quiet-zone borders and automatic plain-text fallback for non-TTY, narrow (< 70 cols), or non-UTF-8 terminals.
+- **Automated PyPI Publishing (CI/CD):**
+  - Added `publish` job in `.github/workflows/ci.yml` using `pypa/gh-action-pypi-publish` with OIDC Trusted Publishing (`pypi` environment) on pushes to `main`.
+
 ## [0.2.0] - 2026-11-21
 
 ### Added
